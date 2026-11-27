@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>老婆生日行程選擇器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE occasion: warm, playful, a little tender
+   IDEA a carnival marquee sign whose bulbs chase while it picks
+   PICTURE the lit sign showing the current option huge, a big press button under it
+   COLOUR raspberry ground, blush-white sign face, deep wine rim and ink, warm white bulbs
+   TYPE LXGW WenKai TC (display) + Noto Sans TC (text)
+   LAYOUT phone: title, sign, button, then options; laptop: toy left, options panel right */
+:root{color-scheme:light dark;--bg:light-dark(#c4114e,#22060f);--ink:light-dark(#fff,#ffe6ef);--rim:light-dark(#7d0a31,#12030a);--rimEdge:light-dark(#a3163f,#3a0c1d);--face:light-dark(#fff6f9,#35091a);--faceInk:light-dark(#5c0624,#ffe3ec);--faceSub:light-dark(#b0476b,#e48aa8);--on:light-dark(#fffbea,#ffe1ea);--off:light-dark(#9b1a45,#4a1426);--btn:light-dark(#fff,#f0336f);--btnInk:light-dark(#b30e47,#fff);--btnSh:light-dark(#7d0a31,#8e0f3d);--panel:light-dark(#fff,#300817);--pInk:light-dark(#3b0718,#ffe3ec);--pSub:light-dark(#8a4a60,#c98aa0);--chip:light-dark(#fde8ef,#4a1023);--hot:light-dark(#c4114e,#f0336f);--line:light-dark(#f2c6d5,#5a1a30)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Noto Sans TC",system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
+.app{max-width:640px;margin:0 auto;padding:0 max(4vw,16px) 56px}
+.toy{position:relative;min-height:100vh;min-height:100svh;display:grid;align-content:center;justify-items:center;gap:clamp(12px,2.4svh,22px);padding:20px 0 76px}
+.hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);min-height:44px;padding:0 16px;border:0;border-radius:22px;background:none;color:var(--ink);opacity:.75;font:14px "Noto Sans TC",sans-serif;cursor:pointer;white-space:nowrap}
+.hint:hover{opacity:1}
+.hint:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+h1{font:700 clamp(30px,6.4vw,46px)/1.05 "LXGW WenKai TC","Noto Sans TC",serif;letter-spacing:-.01em;margin:0;justify-self:start;text-wrap:balance}
+.sign{position:relative;width:100%;background:var(--rim);border-radius:30px;padding:24px;box-shadow:inset 0 2px 0 var(--rimEdge),0 12px 0 color-mix(in srgb,var(--rim) 70%,#000)}
+.sign svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.face{position:relative;background:var(--face);color:var(--faceInk);border-radius:16px;height:clamp(150px,min(46vw,30svh),280px);display:grid;place-content:center;text-align:center;padding:16px;overflow:hidden;box-shadow:inset 0 -8px 0 color-mix(in srgb,var(--faceInk) 6%,transparent)}
+.cap{font-size:15px;font-weight:500;color:var(--faceSub);min-height:1.5em}
+.opt{font:700 clamp(44px,13vw,84px)/1.1 "LXGW WenKai TC","Noto Sans TC",serif;letter-spacing:-.01em;overflow-wrap:anywhere}
+.opt.m{font-size:clamp(34px,9.5vw,62px)}
+.opt.s{font-size:clamp(26px,7vw,44px)}
+.opt.flip{animation:flip .07s ease-out}
+@keyframes flip{from{transform:translateY(-14%);opacity:.35}to{transform:none;opacity:1}}
+.win .opt{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.78)}to{transform:scale(1)}}
+.halo{fill:var(--on);opacity:0;transition:opacity .08s}
+.core{fill:var(--off);transition:fill .08s}
+.b.on .core{fill:var(--on)}
+.b.on .halo{opacity:.3}
+.status{font-size:17px;min-height:1.6em;margin:4px 0 0;text-align:center}
+.go{width:clamp(120px,min(40vw,21svh),190px);aspect-ratio:1;border-radius:50%;border:0;cursor:pointer;background:var(--btn);color:var(--btnInk);font:700 clamp(28px,7.5vw,36px)/1 "LXGW WenKai TC","Noto Sans TC",serif;box-shadow:0 10px 0 var(--btnSh),inset 0 -8px 0 color-mix(in srgb,var(--btnInk) 12%,transparent),inset 0 5px 0 rgba(255,255,255,.5);transition:transform .08s,box-shadow .08s,background .15s,color .15s;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.go:active{transform:translateY(7px);box-shadow:0 3px 0 var(--btnSh),inset 0 -8px 0 color-mix(in srgb,var(--btnInk) 12%,transparent),inset 0 5px 0 rgba(255,255,255,.5)}
+.go.on{background:var(--btnInk);color:var(--btn)}
+.go:focus-visible{outline:4px solid var(--ink);outline-offset:6px}
+.fx{position:absolute;inset:0;pointer-events:none}
+.fx i{position:absolute;left:50%;top:50%;width:9px;height:14px;border-radius:2px;background:var(--c);animation:boom 1.2s cubic-bezier(.15,.7,.3,1) forwards}
+@keyframes boom{from{transform:translate(-50%,-50%) rotate(0);opacity:1}to{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(var(--r));opacity:0}}
+.panel{background:var(--panel);color:var(--pInk);border:1px solid color-mix(in srgb,var(--line) 50%,transparent);border-radius:24px;padding:22px clamp(16px,3vw,26px) 24px;display:grid;gap:14px}
+h2{font:700 22px/1.2 "LXGW WenKai TC","Noto Sans TC",serif;margin:0;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+h2 small{font:500 14px "Noto Sans TC",sans-serif;color:var(--pSub)}
+h3{font:700 17px/1.3 "Noto Sans TC",sans-serif;margin:0}
+.sghead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px}
+.more{min-height:40px;border-radius:20px;border:1.5px solid var(--line);background:none;color:var(--hot);font:700 15px "Noto Sans TC",sans-serif;padding:0 14px;cursor:pointer;white-space:nowrap}
+.more:hover{border-color:var(--hot)}
+.more:disabled{opacity:.4;cursor:default}
+.chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0}
+.chip{display:inline-flex;align-items:center;min-height:44px;border-radius:22px;background:var(--chip);padding:0 3px 0 16px;gap:2px;transition:background .1s,color .1s}
+.chip.cur{background:var(--hot);color:#fff}
+.x{width:38px;height:38px;border:0;background:none;color:inherit;border-radius:50%;font-size:20px;line-height:1;cursor:pointer;opacity:.55}
+.x:hover{opacity:1;background:color-mix(in srgb,currentColor 12%,transparent)}
+.sg{min-height:44px;border-radius:22px;border:1.5px dashed var(--line);background:none;color:var(--pInk);padding:0 14px;font:16px "Noto Sans TC",sans-serif;cursor:pointer}
+.sg:hover{border-style:solid;border-color:var(--hot)}
+.add{display:flex;gap:8px}
+.add input{flex:1;height:48px;border-radius:14px;border:1.5px solid var(--line);background:transparent;color:var(--pInk);font:16px "Noto Sans TC",sans-serif;padding:0 14px}
+.add input:focus{outline:none;border-color:var(--hot);box-shadow:0 0 0 3px color-mix(in srgb,var(--hot) 25%,transparent)}
+.btn{height:48px;border-radius:14px;border:0;background:var(--hot);color:#fff;font:700 16px "Noto Sans TC",sans-serif;padding:0 18px;cursor:pointer;white-space:nowrap}
+.ghost{background:none;color:var(--pSub);border:1.5px solid var(--line);font-weight:500}
+.row{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;border-top:1px solid var(--line);padding-top:14px;margin-top:4px}
+.empty{color:var(--pSub);font-size:15px;padding:10px 0}
+button:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
+.toast{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom,0px));transform:translate(-50%,160%);visibility:hidden;background:var(--pInk);color:var(--panel);border-radius:16px;padding:6px 6px 6px 16px;display:flex;align-items:center;gap:12px;font-size:15px;transition:transform .2s,visibility .2s;max-width:calc(100% - 32px);z-index:5;min-height:52px}
+.toast.show{transform:translate(-50%,0);visibility:visible}
+.toast button{height:40px;border:0;border-radius:12px;background:var(--hot);color:#fff;font:700 15px "Noto Sans TC",sans-serif;padding:0 14px;cursor:pointer}
+.toast button[hidden]{display:none}
+@media(prefers-reduced-motion:reduce){.opt.flip,.win .opt{animation:none}.fx{display:none}.go,.toast{transition:none}}
+</style>
+</head>
+<body>
+<main class="app">
+  <section class="toy">
+    <h1>老婆生日行程選擇器</h1>
+    <div class="sign" id="sign">
+      <svg id="bulbs" aria-hidden="true"></svg>
+      <div class="face" id="face">
+        <div class="cap" id="cap">今天要去哪？</div>
+        <div class="opt" id="opt">？</div>
+      </div>
+      <div class="fx" id="fx"></div>
+    </div>
+    <p class="status" id="status" aria-live="polite">按一下開始轉，再按一下停</p>
+    <button class="go" id="go" type="button">轉！</button>
+    <button class="hint" id="hint" type="button">往下滑編輯選項 ↓</button>
+  </section>
+
+  <section class="panel" aria-labelledby="pt">
+    <h2 id="pt">行程選項 <small id="count"></small></h2>
+    <ul class="chips" id="list"></ul>
+    <form class="add" id="addForm">
+      <input id="newOpt" maxlength="16" placeholder="自己加一個選項" autocomplete="off" aria-label="新增選項">
+      <button class="btn" type="submit">加入</button>
+    </form>
+    <div class="sghead"><h3>更多建議：</h3><button class="more" id="more" type="button">↻ 換一批</button></div>
+    <div class="chips" id="sugg"></div>
+    <div class="row">
+      <button class="btn ghost" id="reset" type="button">恢復預設</button>
+      <button class="btn ghost" id="snd" type="button" aria-pressed="true">音效：開</button>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status"><span id="tmsg"></span><button id="undo" type="button">復原</button></div>
+
+<script>
+{
+const K='wifeBdayPicker.v4';
+const DEF=['泡溫泉','吃牛排','看電影','下午茶','吃火鍋','看風景','兜風','遊樂園','百貨公司','水族館','自由選','SPA按摩','住飯店','早午餐','看夜景','無菜單料理','手作體驗','唱歌','看展覽','搭纜車','採水果','看海','騎單車','搭船'];
+const SUG=['拍情侶寫真','逛夜市','密室逃脫','看夕陽','看日出','逛老街','野餐','做蛋糕','爬山健行','露營','動物園','看表演','聽演唱會','看脫口秀','逛市集','逛書店','吃燒肉','吃日料','吃海鮮','吃Buffet','甜點巡禮','咖啡廳','小酒館','美甲','做臉','拍貼','夾娃娃','打保齡球','射箭','攀岩','划獨木舟','騎馬','火車小旅行','看花海','賞楓','看星星','桌遊','貓咖啡','做香水','品酒','觀光工廠','逛IKEA','看球賽','重遊初次約會地','在家煮大餐'];
+const BATCH=5;
+let batch=[];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const avail=()=>SUG.filter(s=>!opts.includes(s));
+function topUp(){const a=avail();batch=batch.filter(s=>a.includes(s));batch=batch.concat(shuffle(a.filter(s=>!batch.includes(s)))).slice(0,BATCH)}
+function newBatch(){const a=avail();batch=shuffle(a.filter(s=>!batch.includes(s))).concat(shuffle(a.filter(s=>batch.includes(s)))).slice(0,BATCH)}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let opts=DEF.slice(),sound=true;
+try{const v=JSON.parse(localStorage.getItem(K)||'null');if(v&&Array.isArray(v.opts)&&v.opts.every(s=>typeof s==='string'))opts=v.opts.slice(0,60);if(v&&typeof v.sound==='boolean')sound=v.sound}catch(e){}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify({opts,sound}))}catch(e){}};
+
+const go=$('go'),opt=$('opt'),cap=$('cap'),face=$('face'),status=$('status'),list=$('list'),sugg=$('sugg'),svg=$('bulbs'),sign=$('sign'),fx=$('fx'),input=$('newOpt');
+let idx=-1,spinning=false,stopping=false,won=false,timer=0,blinkT=0,step=0,idleStep=0,mode='idle',blink=true,bulbs=[],undoData=null,toastT=0;
+
+/* sound */
+let ac=null,master=null;
+function audio(){
+  try{
+    if(navigator.audioSession)navigator.audioSession.type='playback';
+    if(!ac){
+      ac=new(window.AudioContext||window.webkitAudioContext)();
+      const comp=ac.createDynamicsCompressor();master=ac.createGain();master.gain.value=.9;master.connect(comp).connect(ac.destination);
+      const s=ac.createBufferSource();s.buffer=ac.createBuffer(1,1,22050);s.connect(ac.destination);s.start(0);
+    }
+    if(ac.state==='suspended')ac.resume();
+  }catch(e){ac=null}
+}
+function note(f,t0,d,g,type){const o=ac.createOscillator(),n=ac.createGain();o.type=type||'triangle';o.frequency.value=f;n.gain.setValueAtTime(.0001,t0);n.gain.exponentialRampToValueAtTime(g,t0+.012);n.gain.exponentialRampToValueAtTime(.0001,t0+d);o.connect(n).connect(master);o.start(t0);o.stop(t0+d+.05)}
+function beep(f,d,g){if(!sound||!ac)return;try{note(f,ac.currentTime,d,g)}catch(e){}}
+function chime(){
+  if(!sound||!ac)return;
+  try{
+    const t=ac.currentTime+.02;
+    [392,523,659,784].forEach((f,i)=>{note(f,t+i*.1,.2,.24);note(f*2,t+i*.1,.14,.06,'sine')});
+    [523,659,784,1047].forEach(f=>note(f,t+.42,1.3,.13));
+    note(262,t+.42,1.3,.12,'sine');
+    for(let i=0;i<7;i++)note(1568*(1+Math.random()),t+.5+i*.08,.16,.05,'sine');
+  }catch(e){}
+}
+
+/* display */
+function show(t,flip){const n=[...t].length;opt.textContent=t;opt.className='opt'+(n>7?' s':n>4?' m':'');if(flip){void opt.offsetWidth;opt.classList.add('flip')}}
+function markCur(){[...list.children].forEach((li,i)=>li.classList.toggle('cur',(spinning||won)&&i===idx))}
+
+function renderList(){
+  list.innerHTML=opts.length?opts.map((o,i)=>`<li class="chip"><span>${esc(o)}</span><button class="x" type="button" data-i="${i}" aria-label="移除${esc(o)}">×</button></li>`).join(''):'<li class="empty">還沒有選項，從下面加幾個吧</li>';
+  $('count').textContent=opts.length+' 個';
+  topUp();
+  sugg.innerHTML=batch.length?batch.map(s=>`<button class="sg" type="button" data-s="${esc(s)}">＋ ${esc(s)}</button>`).join(''):'<span class="empty">建議都加進去了</span>';
+  $('more').disabled=avail().length<=batch.length;
+  markCur();
+}
+
+/* marquee bulbs */
+function light(){bulbs.forEach((b,i)=>{const on=mode==='spin'?(i+step)%3===0:mode==='win'?blink:(i+idleStep)%2===0;b.classList.toggle('on',on)})}
+function drawBulbs(){
+  const W=sign.clientWidth,H=sign.clientHeight;if(!W||!H)return;
+  const d=12,r=18,a=d,b=d,c=W-d,e=H-d;
+  svg.innerHTML=`<path fill="none" d="M${a+r},${b}H${c-r}A${r},${r} 0 0 1 ${c},${b+r}V${e-r}A${r},${r} 0 0 1 ${c-r},${e}H${a+r}A${r},${r} 0 0 1 ${a},${e-r}V${b+r}A${r},${r} 0 0 1 ${a+r},${b}Z"/>`;
+  const p=svg.firstChild,L=p.getTotalLength(),n=Math.max(12,Math.round(L/26));let out='';
+  for(let i=0;i<n;i++){const q=p.getPointAtLength(L*i/n),x=q.x.toFixed(1),y=q.y.toFixed(1);out+=`<g class="b"><circle class="halo" cx="${x}" cy="${y}" r="9"/><circle class="core" cx="${x}" cy="${y}" r="4.5"/></g>`}
+  svg.innerHTML=out;bulbs=[...svg.querySelectorAll('.b')];light();
+}
+const ro=new ResizeObserver(drawBulbs);ro.observe(sign);
+const idleT=setInterval(()=>{if(mode==='idle'){idleStep++;light()}},600);
+
+/* spin */
+function pick(){if(opts.length<2)return 0;let j;do{j=Math.floor(Math.random()*opts.length)}while(j===idx);return j}
+function tick(){idx=pick();show(opts[idx]||'？',true);markCur();step++;light();beep(1400,.03,.05)}
+function start(){
+  if(opts.length<2){status.textContent='至少要有兩個選項才能轉喔';return}
+  clearInterval(blinkT);spinning=true;won=false;mode='spin';face.classList.remove('win');
+  go.classList.add('on');go.textContent='停！';cap.textContent='轉啊轉…';status.textContent='再按一下停';
+  timer=setInterval(tick,70);
+}
+function stop(){
+  stopping=true;clearInterval(timer);
+  const delays=[90,120,160,210,270,350];let k=0;
+  const next=()=>{tick();if(k<delays.length)timer=setTimeout(next,delays[k++]);else land()};
+  next();
+}
+function land(){
+  spinning=false;stopping=false;won=true;mode='win';
+  const name=opts[idx]||'';markCur();
+  face.classList.remove('win');void face.offsetWidth;face.classList.add('win');
+  cap.textContent='就決定是';status.textContent=`生日就去「${name}」！`;
+  go.classList.remove('on');go.textContent='再轉';
+  boom();chime();try{navigator.vibrate&&navigator.vibrate([30,40,60])}catch(e){}
+  let c=0;blink=false;light();
+  blinkT=setInterval(()=>{blink=!blink;light();if(++c>=7){clearInterval(blinkT);blink=true;light()}},160);
+}
+function boom(){
+  const cols=['#fff','#ffd1df','#ff5c8a','#ffe58a','#7d0a31'];let h='';
+  for(let i=0;i<40;i++){const ang=Math.random()*Math.PI*2,dist=110+Math.random()*170;h+=`<i style="--c:${cols[i%cols.length]};--x:${(Math.cos(ang)*dist).toFixed(0)}px;--y:${(Math.sin(ang)*dist*.8-40).toFixed(0)}px;--r:${(Math.random()*720-360).toFixed(0)}deg"></i>`}
+  fx.innerHTML=h;setTimeout(()=>{fx.innerHTML=''},1400);
+}
+go.addEventListener('click',()=>{audio();if(stopping)return;spinning?stop():start()});
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&!/INPUT|BUTTON|TEXTAREA/.test(e.target.tagName)){e.preventDefault();go.click()}});
+
+/* editing */
+function toast(msg,canUndo){$('tmsg').textContent=msg;$('undo').hidden=!canUndo;$('toast').classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>$('toast').classList.remove('show'),4000)}
+function changed(){won=false;if(!spinning&&!stopping)idx=-1;save();renderList()}
+list.addEventListener('click',e=>{const x=e.target.closest('.x');if(!x)return;const i=+x.dataset.i;undoData=opts.slice();const gone=opts.splice(i,1)[0];changed();toast(`已移除「${gone}」`,true)});
+sugg.addEventListener('click',e=>{const s=e.target.closest('.sg');if(!s)return;opts.push(s.dataset.s);changed()});
+$('addForm').addEventListener('submit',e=>{e.preventDefault();const v=input.value.trim();if(!v)return;if(opts.includes(v)){toast(`已經有「${v}」了`,false);return}opts.push(v);input.value='';changed()});
+$('reset').addEventListener('click',()=>{undoData=opts.slice();opts=DEF.slice();changed();toast('已恢復預設選項',true)});
+$('undo').addEventListener('click',()=>{if(undoData){opts=undoData;undoData=null;changed()}$('toast').classList.remove('show')});
+$('more').addEventListener('click',()=>{newBatch();renderList()});
+$('hint').addEventListener('click',()=>$('pt').scrollIntoView({behavior:'smooth',block:'start'}));
+const sndBtn=$('snd');
+const paintSnd=()=>{sndBtn.textContent='音效：'+(sound?'開':'關');sndBtn.setAttribute('aria-pressed',String(sound))};
+sndBtn.addEventListener('click',()=>{sound=!sound;audio();paintSnd();save()});
+
+paintSnd();renderList();
+}
+</script>
+</body>
+</html>
